@@ -8,6 +8,8 @@ import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import io.fabric.sdk.android.Fabric;
 import android.content.Intent;
+import android.widget.Toast;
+
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -22,22 +24,35 @@ public class LoginActivity extends Activity {
     private static final String TWITTER_SECRET = "8On2ncVaZLw92LA99lRtO2ODVvHNfOojeNUBaP6IwTUu7icN3g";
     private TwitterLoginButton loginButton;
 
+    private void startMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_login);
+
+        TwitterSession session = Twitter.getSessionManager().getActiveSession();
+
+        if (session != null) {
+            startMainActivity();
+        }
+
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                // Do something with result, which provides a TwitterSession for making API calls
+                startMainActivity();
             }
 
             @Override
             public void failure(TwitterException exception) {
-                // Do something on failure
+                Toast.makeText(LoginActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
