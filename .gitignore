@@ -37,7 +37,6 @@ gen-external-apklibs
 
 ### Gradle ###
 .gradle
-build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -47,7 +46,6 @@ gradle-app.setting
 
 
 ### Java ###
-*.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -146,3 +144,4 @@ atlassian-ide-plugin.xml
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
+/proguard-com.twitter.sdk.android.twitter.txt
