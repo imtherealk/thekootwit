@@ -1,5 +1,6 @@
 package com.realk.thekootwit.service;
 
+import com.realk.thekootwit.model.CursoredUsers;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.List;
@@ -13,6 +14,6 @@ import retrofit.http.Query;
  */
 public interface ListService {
     @GET("/lists/members.json")
-    void members(@Query("slug") String slug, @Query("owner_id") int ownerId, Callback<List<User>> callback);
+    void members(@Query("slug") String slug, @Query("owner_id") int ownerId, Callback<CursoredUsers> callback);
 
 }
