@@ -1,5 +1,6 @@
 package com.realk.thekootwit;
 
+import com.realk.thekootwit.service.ListService;
 import com.realk.thekootwit.service.UserService;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Session;
@@ -23,6 +24,9 @@ public class CustomTwitterApiClient extends TwitterApiClient {
         return this.getService(UserService.class);
     }
 
+    public ListService getCustomListService() {
+        return this.getService(ListService.class);
+    }
     public static CustomTwitterApiClient getSharedClient(Session session) {
         if (!sharedClients.containsKey(session)) {
             sharedClients.put(session, new CustomTwitterApiClient(session));
