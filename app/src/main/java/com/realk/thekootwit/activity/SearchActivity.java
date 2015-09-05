@@ -4,16 +4,33 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.R;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.models.User;
+
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 public class SearchActivity extends Activity {
+    private String query = null;
+    private int page = 1;
+
+    CustomTwitterApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        client =  CustomTwitterApiClient.getActiveClient();
     }
 
     @Override
