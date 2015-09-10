@@ -9,16 +9,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <EditText
+            android:id="@+id/searchbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2" />
         <Button
+            android:id="@+id/btnsearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="검색"
             />
     </LinearLayout>
     <ListView
+        android:id="@+id/searchresult"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
