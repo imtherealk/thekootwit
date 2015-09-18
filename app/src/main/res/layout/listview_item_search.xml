@@ -1,38 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="6dp">
 
     <ImageView
         android:id="@+id/user_profile_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_margin="3dp"
+        android:layout_gravity="start"
         android:src="@mipmap/ic_launcher"/>
-    <TextView
-        android:id="@+id/username"
+    <LinearLayout
+        android:layout_weight="2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_margin="3dp"
-        android:layout_toEndOf="@id/user_profile_image"
-        android:text="유령"/>
-    <TextView
-        android:id="@+id/biography"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:layout_toEndOf="@id/user_profile_image"
-        android:layout_below="@id/username"
-        android:text="내 바이오그래피/으앙"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="유령"/>
+        <TextView
+            android:id="@+id/biography"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="내 바이오그래피/으앙"/>
+    </LinearLayout>
     <ImageButton
         android:id="@+id/btnfollow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
+        android:layout_gravity="end"
         android:src="@drawable/follow"/>
 
-</RelativeLayout>
+</LinearLayout>
