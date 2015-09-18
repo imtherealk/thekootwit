@@ -30,6 +30,10 @@
             android:name=".activity.SearchActivity"
             android:label="@string/title_activity_search" >
         </activity>
+        <activity
+            android:name=".activity.ListManagerActivity"
+            android:label="@string/title_activity_list_manager" >
+        </activity>
     </application>
 
 </manifest>

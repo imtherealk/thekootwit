@@ -1,7 +1,6 @@
 package com.realk.thekootwit.activity;
 
 import android.app.Activity;
-
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
