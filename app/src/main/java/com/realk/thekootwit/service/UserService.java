@@ -12,6 +12,6 @@ import retrofit.http.Query;
  * Retrofit twitter service
  */
 public interface UserService {
-    @GET("/users/search.json")
+    @GET("/1.1/users/search.json")
     void search(@Query("q") String query, @Query("page") int page, Callback<List<User>> callback);
 }
