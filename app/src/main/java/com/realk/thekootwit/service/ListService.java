@@ -7,6 +7,7 @@ import java.util.List;
 
 import retrofit.Callback;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import retrofit.http.Query;
 
 /**
@@ -14,6 +15,8 @@ import retrofit.http.Query;
  */
 public interface ListService {
     @GET("/1.1/lists/members.json")
-    void members(@Query("slug") String slug, @Query("owner_id") int ownerId, Callback<CursoredUsers> callback);
+    void members(@Query("slug") String slug, @Query("owner_id") long ownerId, Callback<CursoredUsers> callback);
 
+    @POST("/1.1/lists/create.json?mode=private&description=The%20koo%20twit%20%EA%B8%B0%EB%B3%B8%20list")
+    void create(@Query("name") String name, Callback<Object> callback);
 }

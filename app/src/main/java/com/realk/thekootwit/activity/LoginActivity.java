@@ -1,14 +1,22 @@
 package com.realk.thekootwit.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.realk.thekootwit.CustomTwitterApiClient;
+import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
+import com.realk.thekootwit.model.CursoredUsers;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import io.fabric.sdk.android.Fabric;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -32,6 +40,55 @@ public class LoginActivity extends Activity {
         finish();
     }
 
+    private void createList() {
+        CustomTwitterApiClient.getActiveClient().getCustomListService().create(Globals.LIST_SLUG, new retrofit.Callback<Object>() {
+            @Override
+            public void success(Object o, Response response) {
+                startMainActivity();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                new AlertDialog.Builder(LoginActivity.this)
+                        .setTitle("재시도하시겠습니까?")
+                        .setMessage("리스트 생성에 실패했습니다.")
+                        .setPositiveButton("재시도", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                afterLogin();
+                            }
+                        })
+                        .setNegativeButton("종료", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    private void afterLogin() {
+        long userId = Twitter.getSessionManager().getActiveSession().getUserId();
+        CustomTwitterApiClient.getActiveClient().getCustomListService().members(Globals.LIST_SLUG, userId, new retrofit.Callback<CursoredUsers>() {
+            @Override
+            public void success(CursoredUsers cursoredUsers, Response response) {
+                startMainActivity();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (error.getResponse().getStatus() == 404) {
+                    createList();
+                } else {
+                    Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +99,14 @@ public class LoginActivity extends Activity {
         TwitterSession session = Twitter.getSessionManager().getActiveSession();
 
         if (session != null) {
-            startMainActivity();
+            afterLogin();
         }
 
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                startMainActivity();
+                afterLogin();
             }
 
             @Override
