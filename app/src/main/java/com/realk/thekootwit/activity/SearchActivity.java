@@ -2,13 +2,13 @@ package com.realk.thekootwit.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,12 +18,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.R;
 import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit.Callback;
@@ -32,32 +36,13 @@ import retrofit.client.Response;
 
 
 public class SearchActivity extends Activity {
-    private String query = null;
-    private int page = 1;
     EditText searchEditText;
     Button searchButton;
     ListView searchResultListView;
     List<User> users = new ArrayList<>();
+    boolean loading = false;
+    boolean noMore = false;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        searchEditText = (EditText) findViewById(R.id.searchbox);
-        searchButton = (Button) findViewById(R.id.btnsearch);
-        searchResultListView = (ListView) findViewById(R.id.searchresult);
-
-        searchResultListView.setAdapter(searchResultAdapter);
-
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                query = searchEditText.getText().toString();
-                searchUsersFromTwitter();
-            }
-        });
-
-    }
     private final BaseAdapter searchResultAdapter = new BaseAdapter() {
         @Override
         public int getCount() {
@@ -119,6 +104,46 @@ public class SearchActivity extends Activity {
             return convertView;
         }
     };
+    private String query = null;
+    private int page = 1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+        searchEditText = (EditText) findViewById(R.id.searchbox);
+        searchButton = (Button) findViewById(R.id.btnsearch);
+        searchResultListView = (ListView) findViewById(R.id.searchresult);
+
+        searchResultListView.setAdapter(searchResultAdapter);
+
+        // Add loading footer
+        View loadMoreView = LayoutInflater.from(this).inflate(R.layout.view_loadmore, null);
+        searchResultListView.addFooterView(loadMoreView);
+
+        searchResultListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (visibleItemCount != 1 && firstVisibleItem + visibleItemCount == totalItemCount) {
+                    searchMore();
+                }
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                query = searchEditText.getText().toString();
+                searchUsersFromTwitter();
+            }
+        });
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -147,15 +172,64 @@ public class SearchActivity extends Activity {
         searchResultAdapter.notifyDataSetChanged();
     }
 
+    void appendUserList(List<User> newUsers) {
+        Iterable<User> filtered = Iterables.filter(newUsers, new Predicate<User>() {
+            @Override
+            public boolean apply(final User newUser) {
+                return Iterables.all(users, new Predicate<User>() {
+                    @Override
+                    public boolean apply(User user) {
+                        return user.getId() != newUser.getId();
+                    }
+                });
+            }
+        });
+        this.users = Lists.newLinkedList(Iterables.concat(this.users, filtered));
+        searchResultAdapter.notifyDataSetChanged();
+    }
+
     void searchUsersFromTwitter() {
+        if(loading){
+            return;
+        }
+        loading = true;
         CustomTwitterApiClient.getActiveClient().getUserService().search(query, page, new Callback<List<User>>() {
             @Override
             public void success(List<User> users, Response response) {
                 updateUserList(users);
+                loading = false;
+                noMore = false;
             }
 
             @Override
             public void failure(RetrofitError error) {
+                loading = false;
+                Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    void searchMore() {
+        if(loading || noMore){
+            return;
+        }
+        loading = true;
+        CustomTwitterApiClient.getActiveClient().getUserService().search(query, page + 1, new Callback<List<User>>() {
+            @Override
+            public void success(List<User> newUsers, Response response) {
+                int size = users.size();
+                appendUserList(newUsers);
+                if(size == users.size()) {
+                    noMore = true;
+                } else {
+                    page++;
+                }
+                loading = false;
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                loading = false;
                 Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
