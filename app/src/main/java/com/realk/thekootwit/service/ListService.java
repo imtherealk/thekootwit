@@ -17,6 +17,14 @@ public interface ListService {
     @GET("/1.1/lists/members.json")
     void members(@Query("slug") String slug, @Query("owner_id") long ownerId, Callback<CursoredUsers> callback);
 
+    @GET("/1.1/lists/members.json")
+    void members(@Query("slug") String slug, @Query("owner_id") long ownerId, @Query("count") long count,
+                 @Query("cursor") long cursor, Callback<CursoredUsers> callback);
+
     @POST("/1.1/lists/create.json?mode=private&description=The%20koo%20twit%20%EA%B8%B0%EB%B3%B8%20list")
     void create(@Query("name") String name, Callback<Object> callback);
+
+    @POST("/1.1/lists/members/create.json")
+    void addMember(@Query("slug") String slug, @Query("owner_id") long ownerId,
+                   @Query("user_id") long userId, Callback<Object> callback);
 }

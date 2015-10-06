@@ -22,12 +22,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.realk.thekootwit.CustomTwitterApiClient;
+import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
 import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit.Callback;
@@ -44,6 +45,12 @@ public class SearchActivity extends Activity {
     boolean noMore = false;
 
     private final BaseAdapter searchResultAdapter = new BaseAdapter() {
+        class ViewHolder {
+            ImageView profleImage;
+            TextView username;
+            TextView biography;
+            ImageButton followButton;
+        }
         @Override
         public int getCount() {
             return users.size();
@@ -85,11 +92,7 @@ public class SearchActivity extends Activity {
             viewHolder.followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Button followButton = (Button) v;
-                    /*
-                    // follow
-                    */
-                    Toast.makeText(SearchActivity.this, "사용자를 팔로우함", Toast.LENGTH_LONG);
+                    follow(user);
                 }
             });
 
@@ -214,12 +217,13 @@ public class SearchActivity extends Activity {
             return;
         }
         loading = true;
+
         CustomTwitterApiClient.getActiveClient().getUserService().search(query, page + 1, new Callback<List<User>>() {
             @Override
             public void success(List<User> newUsers, Response response) {
                 int size = users.size();
                 appendUserList(newUsers);
-                if(size == users.size()) {
+                if (size == users.size()) {
                     noMore = true;
                 } else {
                     page++;
@@ -235,10 +239,18 @@ public class SearchActivity extends Activity {
         });
     }
 
-    private static class ViewHolder {
-        ImageView profleImage;
-        TextView username;
-        TextView biography;
-        ImageButton followButton;
+    void follow(User user){
+        long userId = Twitter.getSessionManager().getActiveSession().getUserId();
+        CustomTwitterApiClient.getActiveClient().getCustomListService().addMember(Globals.LIST_SLUG, userId, user.getId(), new Callback<Object>() {
+            @Override
+            public void success(Object o, Response response) {
+                Toast.makeText(SearchActivity.this, "성공", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

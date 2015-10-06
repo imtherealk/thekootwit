@@ -53,17 +53,19 @@ public class MainActivity extends Activity
 
     public void onSectionAttached(int number) {
         switch (number) {
-            case 1:
+            case 1: {
                 mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
+                Intent intent = new Intent(MainActivity.this, ListManagerActivity.class);
+                startActivity(intent);
+            } break;
+            case 2: {
                 mTitle = getString(R.string.title_section2);
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                 startActivity(intent);
-                break;
-            case 3:
+            } break;
+            case 3: {
                 mTitle = getString(R.string.title_section3);
-                break;
+            } break;
         }
     }
 
