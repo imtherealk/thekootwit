@@ -27,4 +27,8 @@ public interface ListService {
     @POST("/1.1/lists/members/create.json")
     void addMember(@Query("slug") String slug, @Query("owner_id") long ownerId,
                    @Query("user_id") long userId, Callback<Object> callback);
+
+    @POST("/1.1/lists/members/destroy.json")
+    void removeMember(@Query("slug") String slug, @Query("owner_id") long ownerId,
+                       @Query("user_id") long userId, Callback<Object> callback);
 }
