@@ -146,10 +146,7 @@ public class ListManagerActivity extends Activity {
             viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*
-                    // follow
-                    */
-                    Toast.makeText(ListManagerActivity.this, "사용자를 언팔로우함", Toast.LENGTH_LONG).show();
+                    unfollow(user);
                 }
             });
 
@@ -164,4 +161,20 @@ public class ListManagerActivity extends Activity {
             return convertView;
         }
     };
+    void unfollow(final User user){
+        long userId = Twitter.getSessionManager().getActiveSession().getUserId();
+        CustomTwitterApiClient.getActiveClient().getCustomListService().removeMember(Globals.LIST_SLUG, userId, user.getId(), new Callback<Object>() {
+            @Override
+            public void success(Object o, Response response) {
+                Toast.makeText(ListManagerActivity.this, "성공", Toast.LENGTH_LONG).show();
+                users.remove(user);
+                listAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(ListManagerActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
