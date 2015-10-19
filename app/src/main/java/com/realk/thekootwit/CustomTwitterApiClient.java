@@ -38,4 +38,8 @@ public class CustomTwitterApiClient extends TwitterApiClient {
         TwitterSession session = Twitter.getSessionManager().getActiveSession();
         return getSharedClient(session);
     }
+
+    public static long getActiveUserId() {
+        return Twitter.getSessionManager().getActiveSession().getUserId();
+    }
 }
