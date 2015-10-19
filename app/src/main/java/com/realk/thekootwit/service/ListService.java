@@ -1,6 +1,7 @@
 package com.realk.thekootwit.service;
 
 import com.realk.thekootwit.model.CursoredUsers;
+import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.User;
 
 import java.util.List;
@@ -31,4 +32,7 @@ public interface ListService {
     @POST("/1.1/lists/members/destroy.json")
     void removeMember(@Query("slug") String slug, @Query("owner_id") long ownerId,
                        @Query("user_id") long userId, Callback<Object> callback);
+
+    @GET("/1.1/lists/statuses.json?count=20")
+    void statuses(@Query("slug") String slug, @Query("owner_id") long ownerId, @Query("max_id") long maxId, Callback<List<Tweet>> callback);
 }
