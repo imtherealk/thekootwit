@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
@@ -64,6 +66,8 @@ public class TimelineFragment extends Fragment {
                 viewHolder.userId = (TextView) convertView.findViewById(R.id.user_id);
                 viewHolder.content = (TextView) convertView.findViewById(R.id.content);
                 viewHolder.retweetButton = (ImageButton) convertView.findViewById(R.id.btn_retweet);
+                viewHolder.retweetButton.setImageDrawable(
+                        new IconDrawable(getActivity(), FontAwesomeIcons.fa_retweet).sizeDp(20));
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }

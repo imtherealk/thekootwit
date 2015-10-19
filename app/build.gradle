@@ -52,4 +52,13 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.3.7@aar') {
         transitive = true
     }
+    compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-entypo:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-typicons:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-material:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-material-community:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-meteocons:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-simplelineicons:2.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-ionicons:2.1.0'
 }
