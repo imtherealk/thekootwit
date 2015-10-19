@@ -137,8 +137,8 @@ public class TimelineActivity extends Activity {
 
             final Tweet tweet = (Tweet) this.getItem(position);
             Picasso.with(TimelineActivity.this).load(tweet.user.profileImageUrl).into(viewHolder.profileImage);
-            viewHolder.userName.setText(tweet.user.screenName);
-            viewHolder.userId.setText(tweet.user.name);
+            viewHolder.userName.setText(tweet.user.name);
+            viewHolder.userId.setText("@" + tweet.user.screenName);
             viewHolder.content.setText(tweet.text);
 
             viewHolder.retweetButton.setOnClickListener(new View.OnClickListener() {
