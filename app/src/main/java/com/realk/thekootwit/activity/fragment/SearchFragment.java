@@ -1,8 +1,9 @@
-package com.realk.thekootwit.activity;
+package com.realk.thekootwit.activity.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +37,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class SearchActivity extends Activity {
+public class SearchFragment extends Fragment {
     EditText searchEditText;
     Button searchButton;
     ListView searchResultListView;
@@ -71,7 +72,7 @@ public class SearchActivity extends Activity {
             /*  */
             ViewHolder viewHolder;
             if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
                 viewHolder = new ViewHolder();
@@ -85,7 +86,7 @@ public class SearchActivity extends Activity {
             }
 
             final User user = (User) this.getItem(position);
-            Picasso.with(SearchActivity.this).load(user.profileImageUrl).into(viewHolder.profileImage);
+            Picasso.with(getActivity()).load(user.profileImageUrl).into(viewHolder.profileImage);
             viewHolder.username.setText(user.name);
             viewHolder.biography.setText(user.description);
 
@@ -101,7 +102,7 @@ public class SearchActivity extends Activity {
                     /*
                     // twitter app
                     */
-                    Toast.makeText(SearchActivity.this, "트위터 앱 연결", Toast.LENGTH_LONG);
+                    Toast.makeText(getActivity(), "트위터 앱 연결", Toast.LENGTH_LONG);
                 }
             });
             return convertView;
@@ -111,17 +112,17 @@ public class SearchActivity extends Activity {
     private int page = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        searchEditText = (EditText) findViewById(R.id.searchbox);
-        searchButton = (Button) findViewById(R.id.btnsearch);
-        searchResultListView = (ListView) findViewById(R.id.searchresult);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        searchEditText = (EditText) view.findViewById(R.id.searchbox);
+        searchButton = (Button) view.findViewById(R.id.btnsearch);
+        searchResultListView = (ListView) view.findViewById(R.id.searchresult);
 
         searchResultListView.setAdapter(searchResultAdapter);
 
         // Add loading footer
-        View loadMoreView = LayoutInflater.from(this).inflate(R.layout.view_loadmore, null);
+        View loadMoreView = inflater.inflate(R.layout.view_loadmore, null);
         searchResultListView.addFooterView(loadMoreView);
 
         searchResultListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -145,14 +146,7 @@ public class SearchActivity extends Activity {
                 searchUsersFromTwitter();
             }
         });
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+        return view;
     }
 
     @Override
@@ -207,7 +201,7 @@ public class SearchActivity extends Activity {
             @Override
             public void failure(RetrofitError error) {
                 loading = false;
-                Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -234,7 +228,7 @@ public class SearchActivity extends Activity {
             @Override
             public void failure(RetrofitError error) {
                 loading = false;
-                Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -244,12 +238,12 @@ public class SearchActivity extends Activity {
         CustomTwitterApiClient.getActiveClient().getCustomListService().addMember(Globals.LIST_SLUG, userId, user.getId(), new Callback<Object>() {
             @Override
             public void success(Object o, Response response) {
-                Toast.makeText(SearchActivity.this, "성공", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "성공", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(SearchActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

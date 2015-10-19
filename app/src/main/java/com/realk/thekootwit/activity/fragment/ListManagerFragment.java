@@ -1,10 +1,9 @@
-package com.realk.thekootwit.activity;
+package com.realk.thekootwit.activity.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +32,73 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class ListManagerActivity extends Activity {
+public class ListManagerFragment extends Fragment {
     ListView listView;
     private List<User> users = new ArrayList<User>();
+    private final BaseAdapter listAdapter = new BaseAdapter() {
+        @Override
+        public int getCount() {
+            return users.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return users.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            /*  */
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.profleImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
+                viewHolder.username = (TextView) convertView.findViewById(R.id.username);
+                viewHolder.biography = (TextView) convertView.findViewById(R.id.biography);
+                viewHolder.unfollowButton = (ImageButton) convertView.findViewById(R.id.btnfollow);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            final User user = (User) this.getItem(position);
+            Picasso.with(getActivity()).load(user.profileImageUrl).into(viewHolder.profleImage);
+            viewHolder.username.setText(user.name);
+            viewHolder.biography.setText(user.description);
+
+            viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    unfollow(user);
+                }
+            });
+
+            convertView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    /*
+                    // twitter app
+                    */
+                    Toast.makeText(getActivity(), "트위터 앱 연결", Toast.LENGTH_LONG).show();
+                }
+            });
+            return convertView;
+        }
+
+        class ViewHolder {
+            ImageView profleImage;
+            TextView username;
+            TextView biography;
+            ImageButton unfollowButton;
+        }
+    };
 
     private void updateMembers(List<User> members) {
         this.users = members;
@@ -58,7 +121,7 @@ public class ListManagerActivity extends Activity {
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(ListManagerActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -68,19 +131,13 @@ public class ListManagerActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_manager);
-        listView = (ListView)findViewById(R.id.followingList);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_list_manager, container, false);
+        listView = (ListView) view.findViewById(R.id.followingList);
         listView.setAdapter(listAdapter);
         fetchMembers();
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list_manager, menu);
-        return true;
+        return view;
     }
 
     @Override
@@ -98,82 +155,19 @@ public class ListManagerActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private final BaseAdapter listAdapter = new BaseAdapter() {
-        class ViewHolder {
-            ImageView profleImage;
-            TextView username;
-            TextView biography;
-            ImageButton unfollowButton;
-        }
-        @Override
-        public int getCount() {
-            return users.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return users.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            /*  */
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(
-                        Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.profleImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
-                viewHolder.username = (TextView) convertView.findViewById(R.id.username);
-                viewHolder.biography = (TextView) convertView.findViewById(R.id.biography);
-                viewHolder.unfollowButton = (ImageButton) convertView.findViewById(R.id.btnfollow);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-
-            final User user = (User) this.getItem(position);
-            Picasso.with(ListManagerActivity.this).load(user.profileImageUrl).into(viewHolder.profleImage);
-            viewHolder.username.setText(user.name);
-            viewHolder.biography.setText(user.description);
-
-            viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    unfollow(user);
-                }
-            });
-
-            convertView.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    /*
-                    // twitter app
-                    */
-                    Toast.makeText(ListManagerActivity.this, "트위터 앱 연결", Toast.LENGTH_LONG).show();
-                }
-            });
-            return convertView;
-        }
-    };
-    void unfollow(final User user){
+    void unfollow(final User user) {
         long userId = Twitter.getSessionManager().getActiveSession().getUserId();
         CustomTwitterApiClient.getActiveClient().getCustomListService().removeMember(Globals.LIST_SLUG, userId, user.getId(), new Callback<Object>() {
             @Override
             public void success(Object o, Response response) {
-                Toast.makeText(ListManagerActivity.this, "성공", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "성공", Toast.LENGTH_LONG).show();
                 users.remove(user);
                 listAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(ListManagerActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

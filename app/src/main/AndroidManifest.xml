@@ -27,13 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SearchActivity"
+            android:name=".activity.fragment.SearchFragment"
             android:label="@string/title_activity_search"/>
         <activity
-            android:name=".activity.ListManagerActivity"
+            android:name=".activity.fragment.ListManagerFragment"
             android:label="@string/title_activity_list_manager"/>
         <activity
-            android:name=".activity.TimelineActivity"
+            android:name=".activity.fragment.TimelineFragment"
             android:label="@string/title_activity_timeline"/>
     </application>
 
