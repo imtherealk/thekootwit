@@ -34,5 +34,8 @@ public interface ListService {
                        @Query("user_id") long userId, Callback<Object> callback);
 
     @GET("/1.1/lists/statuses.json?count=20")
+    void statuses(@Query("slug") String slug, @Query("owner_id") long ownerId, Callback<List<Tweet>> callback);
+
+    @GET("/1.1/lists/statuses.json?count=20")
     void statuses(@Query("slug") String slug, @Query("owner_id") long ownerId, @Query("max_id") long maxId, Callback<List<Tweet>> callback);
 }
