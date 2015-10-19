@@ -3,6 +3,7 @@ package com.realk.thekootwit.activity.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,8 +92,32 @@ public class TimelineFragment extends Fragment {
             ImageButton retweetButton;
         }
     };
+    SwipeRefreshLayout swipeLayout;
     boolean loading = false;
     boolean noMore = false;
+    boolean refreshing = false;
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(final boolean loading) {
+        this.loading = loading;
+    }
+
+    public boolean isRefreshing() {
+        return refreshing;
+    }
+
+    public void setRefreshing(final boolean refreshing) {
+        this.refreshing = refreshing;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                swipeLayout.setRefreshing(refreshing);
+            }
+        });
+    }
 
     void updateTweets(List<Tweet> tweets) {
         this.tweets = tweets;
@@ -104,31 +129,35 @@ public class TimelineFragment extends Fragment {
     }
 
     void fetchTweets() {
-        if (loading) {
+        if (isLoading()) {
             return;
         }
-        loading = true;
+        setLoading(true);
+        setRefreshing(true);
 
         CustomTwitterApiClient.getActiveClient().getCustomListService().statuses(Globals.LIST_SLUG, CustomTwitterApiClient.getActiveUserId(), new Callback<List<Tweet>>() {
             @Override
             public void success(List<Tweet> tweets, Response response) {
                 updateTweets(tweets);
-                loading = false;
+                setLoading(false);
+                setRefreshing(false);
                 noMore = false;
             }
 
             @Override
             public void failure(RetrofitError error) {
+                setLoading(false);
+                setRefreshing(false);
                 Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     void fetchMoreTweets() {
-        if (loading || noMore) {
+        if (isLoading() || noMore) {
             return;
         }
-        loading = true;
+        setLoading(true);
 
         CustomTwitterApiClient.getActiveClient().getCustomListService()
                 .statuses(Globals.LIST_SLUG, CustomTwitterApiClient.getActiveUserId(),
@@ -138,12 +167,13 @@ public class TimelineFragment extends Fragment {
                             public void success(List<Tweet> tweets, Response response) {
                                 tweets = tweets.subList(1, tweets.size());
                                 appendTweets(tweets);
-                                loading = false;
+                                setLoading(false);
                                 noMore = tweets.isEmpty();
                             }
 
                             @Override
                             public void failure(RetrofitError error) {
+                                setLoading(false);
                                 Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                             }
                         });
@@ -154,8 +184,17 @@ public class TimelineFragment extends Fragment {
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_timeline, container, false);
 
+        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_layout);
+
         timelineListView = (ListView) view.findViewById(R.id.timeline);
         timelineListView.setAdapter(timelineListAdapter);
+
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTweets();
+            }
+        });
 
         // Add loading footer
         View loadMoreView = inflater.inflate(R.layout.view_loadmore, null);
