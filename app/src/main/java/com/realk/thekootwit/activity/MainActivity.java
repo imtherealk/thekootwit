@@ -65,6 +65,8 @@ public class MainActivity extends Activity
             } break;
             case 3: {
                 mTitle = getString(R.string.title_section3);
+                Intent intent = new Intent(MainActivity.this, TimelineActivity.class);
+                startActivity(intent);
             } break;
         }
     }

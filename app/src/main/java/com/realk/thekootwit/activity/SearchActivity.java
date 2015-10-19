@@ -46,7 +46,7 @@ public class SearchActivity extends Activity {
 
     private final BaseAdapter searchResultAdapter = new BaseAdapter() {
         class ViewHolder {
-            ImageView profleImage;
+            ImageView profileImage;
             TextView username;
             TextView biography;
             ImageButton followButton;
@@ -75,7 +75,7 @@ public class SearchActivity extends Activity {
                         Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.profleImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
+                viewHolder.profileImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
                 viewHolder.username = (TextView) convertView.findViewById(R.id.username);
                 viewHolder.biography = (TextView) convertView.findViewById(R.id.biography);
                 viewHolder.followButton = (ImageButton) convertView.findViewById(R.id.btnfollow);
@@ -85,7 +85,7 @@ public class SearchActivity extends Activity {
             }
 
             final User user = (User) this.getItem(position);
-            Picasso.with(SearchActivity.this).load(user.profileImageUrl).into(viewHolder.profleImage);
+            Picasso.with(SearchActivity.this).load(user.profileImageUrl).into(viewHolder.profileImage);
             viewHolder.username.setText(user.name);
             viewHolder.biography.setText(user.description);
 

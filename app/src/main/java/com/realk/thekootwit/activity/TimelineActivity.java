@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
+import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.User;
 
@@ -77,7 +79,8 @@ public class TimelineActivity extends Activity {
                         new Callback<List<Tweet>>() {
             @Override
             public void success(List<Tweet> tweets, Response response) {
-                appendTweets(TimelineActivity.this.tweets);
+                tweets = tweets.subList(1, tweets.size());
+                appendTweets(tweets);
                 loading = false;
                 noMore = tweets.isEmpty();
             }
@@ -119,7 +122,7 @@ public class TimelineActivity extends Activity {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
+                convertView = inflater.inflate(R.layout.tweet_listview_item, parent, false);
                 viewHolder = new ViewHolder();
                 convertView.setTag(viewHolder);
 
@@ -133,6 +136,17 @@ public class TimelineActivity extends Activity {
             }
 
             final Tweet tweet = (Tweet) this.getItem(position);
+            Picasso.with(TimelineActivity.this).load(tweet.user.profileImageUrl).into(viewHolder.profileImage);
+            viewHolder.userName.setText(tweet.user.screenName);
+            viewHolder.userId.setText(tweet.user.name);
+            viewHolder.content.setText(tweet.text);
+
+            viewHolder.retweetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: Retweet
+                }
+            });
 
             return convertView;
         }
@@ -144,6 +158,26 @@ public class TimelineActivity extends Activity {
 
         timelineListView = (ListView) findViewById(R.id.timeline);
         timelineListView.setAdapter(timelineListAdapter);
+
+        // Add loading footer
+        View loadMoreView = LayoutInflater.from(this).inflate(R.layout.view_loadmore, null);
+        timelineListView.addFooterView(loadMoreView);
+
+        timelineListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (visibleItemCount != 1 && firstVisibleItem + visibleItemCount == totalItemCount) {
+                    fetchMoreTweets();
+                }
+            }
+        });
+
+        fetchTweets();
     }
 
 }
