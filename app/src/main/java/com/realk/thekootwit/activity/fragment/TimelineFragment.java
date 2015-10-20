@@ -22,14 +22,20 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
+import com.realk.thekootwit.TwitterUtil;
 import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.models.MediaEntity;
 import com.twitter.sdk.android.core.models.Tweet;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -71,6 +77,8 @@ public class TimelineFragment extends Fragment {
                 viewHolder.retweetButton = (ImageButton) convertView.findViewById(R.id.btn_retweet);
                 viewHolder.retweetButton.setImageDrawable(
                         new IconDrawable(getActivity(), FontAwesomeIcons.fa_retweet).sizeDp(20));
+                viewHolder.time = (TextView) convertView.findViewById(R.id.time);
+                viewHolder.photo = (ImageView) convertView.findViewById(R.id.photo);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
@@ -80,6 +88,23 @@ public class TimelineFragment extends Fragment {
             viewHolder.userName.setText(tweet.user.name);
             viewHolder.userId.setText("@" + tweet.user.screenName);
             viewHolder.content.setText(tweet.text);
+            try {
+                Date date = TwitterUtil.getTwitterDate(tweet.createdAt);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 a hh시 mm분", Locale.KOREA);
+                String createdAt = format.format(date);
+                viewHolder.time.setText(createdAt);
+            } catch (ParseException ignored) {
+            }
+            viewHolder.photo.setVisibility(View.GONE);
+            if ((tweet.entities != null && tweet.entities.media != null)) {
+                for (MediaEntity mediaEntity : tweet.entities.media) {
+                    if (mediaEntity.type.equals("photo")) {
+                        viewHolder.photo.setVisibility(View.VISIBLE);
+                        Picasso.with(getActivity()).load(mediaEntity.mediaUrlHttps).into(viewHolder.photo);
+                        break;
+                    }
+                }
+            }
 
             viewHolder.retweetButton.setEnabled(!tweet.retweeted);
             viewHolder.retweetButton.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +139,8 @@ public class TimelineFragment extends Fragment {
             TextView userId;
             TextView content;
             ImageButton retweetButton;
+            ImageView photo;
+            TextView time;
         }
     };
     SwipeRefreshLayout swipeLayout;
