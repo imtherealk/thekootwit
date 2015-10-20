@@ -32,11 +32,11 @@
             android:text="내 바이오그래피/으앙"/>
     </LinearLayout>
     <ImageButton
-        android:id="@+id/btnfollow"
+        android:id="@+id/btn_follow"
+        android:background="@null"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="3dp"
-        android:layout_gravity="end"
-        android:src="@drawable/follow"/>
+        android:layout_gravity="end"/>
 
 </LinearLayout>

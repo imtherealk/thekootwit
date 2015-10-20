@@ -16,6 +16,9 @@ import android.widget.Toast;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.TypiconsIcons;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
@@ -58,12 +61,14 @@ public class ListManagerFragment extends Fragment {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.listview_item_search, parent, false);
+                convertView = inflater.inflate(R.layout.listview_item_listmanager, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.profleImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
                 viewHolder.username = (TextView) convertView.findViewById(R.id.username);
                 viewHolder.biography = (TextView) convertView.findViewById(R.id.biography);
-                viewHolder.unfollowButton = (ImageButton) convertView.findViewById(R.id.btnfollow);
+                viewHolder.unfollowButton = (ImageButton) convertView.findViewById(R.id.btn_unfollow);
+                viewHolder.unfollowButton.setImageDrawable(
+                        new IconDrawable(getActivity(), TypiconsIcons.typcn_user_delete).sizeDp(50));
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

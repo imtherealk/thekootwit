@@ -2,10 +2,8 @@ package com.realk.thekootwit.activity.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +20,9 @@ import android.widget.Toast;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.TypiconsIcons;
 import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
@@ -79,7 +80,9 @@ public class SearchFragment extends Fragment {
                 viewHolder.profileImage = (ImageView) convertView.findViewById(R.id.user_profile_image);
                 viewHolder.username = (TextView) convertView.findViewById(R.id.username);
                 viewHolder.biography = (TextView) convertView.findViewById(R.id.biography);
-                viewHolder.followButton = (ImageButton) convertView.findViewById(R.id.btnfollow);
+                viewHolder.followButton = (ImageButton) convertView.findViewById(R.id.btn_follow);
+                viewHolder.followButton.setImageDrawable(
+                        new IconDrawable(getActivity(), TypiconsIcons.typcn_user_add).sizeDp(50));
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
