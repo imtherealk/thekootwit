@@ -23,9 +23,12 @@ import com.realk.thekootwit.CustomTwitterApiClient;
 import com.realk.thekootwit.Globals;
 import com.realk.thekootwit.R;
 import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit.Callback;
@@ -52,7 +55,7 @@ public class TimelineFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
@@ -78,10 +81,27 @@ public class TimelineFragment extends Fragment {
             viewHolder.userId.setText("@" + tweet.user.screenName);
             viewHolder.content.setText(tweet.text);
 
+            viewHolder.retweetButton.setEnabled(!tweet.retweeted);
             viewHolder.retweetButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: Retweet
+                    CustomTwitterApiClient.getActiveClient().getStatusesService().retweet(tweet.getId(), false, new com.twitter.sdk.android.core.Callback<Tweet>() {
+                        @Override
+                        public void success(Result<Tweet> result) {
+                            Toast.makeText(getActivity(), "리트윗 하였습니다.", Toast.LENGTH_SHORT).show();
+                            Tweet origin = result.data.retweetedStatus;
+                            tweets = Lists.newLinkedList(Iterables.concat(
+                                    tweets.subList(0, position),
+                                    Arrays.asList(origin),
+                                    tweets.subList(position + 1, tweets.size())));
+                            notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void failure(TwitterException e) {
+                            Toast.makeText(getActivity(), "리트윗 못했습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
 
